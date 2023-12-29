@@ -2,21 +2,16 @@
 
 namespace Standard.Core.Shared.Core.Objects;
 
-public class Entity : Notifiable<Notification>, IEquatable<Entity>
+public abstract class Entity : Notifiable<Notification>, IEquatable<Guid>
 {
 	public Entity()
 	{
 		Id = Guid.NewGuid();
-		CreatedDate = DateTime.Now;
-		Active = true;
 	}
 
-	public Guid Id { get; private set; }
-	public DateTime CreatedDate { get; private set; }
-	public bool Active { get; private set; }
+	public Guid Id { get; }
 
-	public bool Equals(Entity other)
-	{
-		return Id == other.Id;
-	}
+	public bool Equals(Guid id) => Id == Id;
+
+	public override int GetHashCode() => Id.GetHashCode();
 }

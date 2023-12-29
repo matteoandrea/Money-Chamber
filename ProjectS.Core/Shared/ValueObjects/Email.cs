@@ -1,26 +1,48 @@
 ﻿using Flunt.Validations;
+using ProjectS.Core.Shared.ValueObjects;
 using Standard.Core.Shared.Core.Objects;
 
 namespace Standard.Core.Shared.ValueObjects;
 
 public class Email : ValueObject
 {
-    public Email(string adress)
-    {
-        Adress = adress;
+	#region Constructors
 
-        AddNotifications(new CreateEmailContract(this));
-    }
+	public Email(string adress)
+	{
+		Adress = adress.Trim().ToLower();
+		VerificationCode = new();
 
-    public string Adress { get; private set; }
+		AddNotifications(new BasicEmailValidationContract(this));
+	}
+
+	#endregion
+
+	#region Propreties
+
+	public string Adress { get; }
+	public VerificationCode VerificationCode { get; private set; }
+
+	#endregion
+
+	#region Functions
+
+	public override string ToString() => Adress;
+
+	public void ResendVerification()
+	{
+		VerificationCode = new();
+	}
+
+	#endregion
 }
 
-public class CreateEmailContract : Contract<Email>
+public class BasicEmailValidationContract : Contract<Email>
 {
-    public CreateEmailContract(Email email)
-    {
-        Requires()
-            .IsEmail(email.Adress, "Email", "Ivalid email");
+	public BasicEmailValidationContract(Email email)
+	{
+		Requires()
+			.IsEmail(email.Adress, "Email", "Ivalid email");
 
-    }
+	}
 }
