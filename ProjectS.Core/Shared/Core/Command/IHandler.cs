@@ -2,5 +2,5 @@
 
 public interface IHandler<T> where T : ICommand
 {
-    ICommandResult Handler(T command);
+	Task<ICommandResult> Handler(T command);
 }

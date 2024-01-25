@@ -20,8 +20,8 @@ public class CreateDescriptionContract : Contract<Description>
     public CreateDescriptionContract(Description description)
     {
         Requires()
-            .IsNotEmpty(description.Value, "Description", "Ivalid description")
+            .IsNotEmpty(description.Value, "Description", "Invalid description")
             .IsGreaterOrEqualsThan(description.Value, 3, "Description", "Description too short")
-            .IsLowerOrEqualsThan(description.Value, 50, "Description", "Description too long");
+            .IsLowerOrEqualsThan(description.Value, 100, "Description", "Description too long");
     }
 }

@@ -20,7 +20,7 @@ public class Email : ValueObject
 
 	#region Propreties
 
-	public string Adress { get; }
+	public string Adress { get; init; }
 	public VerificationCode VerificationCode { get; private set; }
 
 	#endregion

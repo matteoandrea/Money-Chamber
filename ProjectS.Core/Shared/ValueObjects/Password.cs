@@ -1,5 +1,5 @@
 ﻿using Flunt.Validations;
-using ProjectS.Core.Features.Shared;
+using ProjectS.Core.Shared.Core;
 using Standard.Core.Shared.Core.Objects;
 using System.Security.Cryptography;
 using static System.Net.Mime.MediaTypeNames;
