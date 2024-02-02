@@ -8,10 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Flunt" Version="2.0.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Features\Envelopes\Commands\" />
+    <PackageReference Include="MediatR" Version="12.2.0" />
   </ItemGroup>
 
 </Project>

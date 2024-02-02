@@ -1,6 +1,9 @@
-﻿using ProjectS.Core.Features.Users.Core;
-using ProjectS.Core.Features.Users.Handlers;
-using Standard.Core.Shared.ValueObjects;
+﻿using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
+using ProjectS.Core.Models;
+using ProjectS.Core.Repositories;
+using ProjectS.Core.Shared.ValueObjects;
+using ProjectS.Infra.Core;
 
 namespace ProjectS.Infra.Features.Users;
 
@@ -8,29 +11,35 @@ public class UserRepository : IUserRepository
 {
 	#region Constructors
 
-	public UserRepository(IUserRepository userRepository)
+	public UserRepository(DataContext context)
 	{
-		_userRepository = userRepository;
+		_context = context;
 	}
 
 	#endregion
 
 	#region Propreties
 
-	private readonly IUserRepository _userRepository;
+	private readonly DataContext _context;
 
 	#endregion
 
 	#region Functions
 
-	public Task<bool> AnyAsync(Email email)
+	public async Task SaveAsync()
 	{
-		throw new NotImplementedException();
+		await _context.SaveChangesAsync();
 	}
 
-	public Task CreateAsync(User user)
+	public async Task<bool> AnyAsync(Email email)
 	{
-		throw new NotImplementedException();
+		return await _context.Users.FindSync(x => x.Email == email).AnyAsync();
+
+	}
+
+	public async Task CreateAsync(User user)
+	{
+		await _context.Users.InsertOneAsync(user);
 	}
 
 	public Task UpdateAsync(User user)
@@ -38,14 +47,15 @@ public class UserRepository : IUserRepository
 		throw new NotImplementedException();
 	}
 
-	public Task DeleteAsync(User user)
+	public async Task DeleteAsync(Guid id)
 	{
-		throw new NotImplementedException();
+		FilterDefinition<User> filter = Builders<User>.Filter.Eq("Id", id);
+		await _context.Users.DeleteOneAsync(filter);
 	}
 
-	public Task<User> GetByIdAsync(Guid id)
+	public async Task<User?> GetByIdAsync(Guid id)
 	{
-		throw new NotImplementedException();
+		return await _context.Users.AsQueryable().FirstOrDefaultAsync(x => x.Id == id);
 	}
 
 	#endregion
