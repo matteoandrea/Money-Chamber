@@ -14,8 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProjectS.Core\ProjectS.Core.csproj" />
-    <ProjectReference Include="..\ProjectS.Infra\ProjectS.Infra.csproj" />
+    <ProjectReference Include="..\ProjectS.Core\Core.csproj" />
+    <ProjectReference Include="..\ProjectS.Infra\Infra.csproj" />
   </ItemGroup>
 
 </Project>
