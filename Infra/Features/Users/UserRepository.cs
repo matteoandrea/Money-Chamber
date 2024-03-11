@@ -7,23 +7,8 @@ using ProjectS.Infra.Core;
 
 namespace ProjectS.Infra.Features.Users;
 
-public class UserRepository : IUserRepository
+public class UserRepository(DataContext _context) : IUserRepository
 {
-	#region Constructors
-
-	public UserRepository(DataContext context)
-	{
-		_context = context;
-	}
-
-	#endregion
-
-	#region Propreties
-
-	private readonly DataContext _context;
-
-	#endregion
-
 	#region Functions
 
 	public async Task SaveAsync()

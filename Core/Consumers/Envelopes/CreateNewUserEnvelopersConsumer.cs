@@ -1,5 +1,6 @@
-﻿using MediatR;
-using ProjectS.Core.Events.Users;
+﻿using Core.Commands;
+using Core.Core;
+using MassTransit;
 using ProjectS.Core.Features.Envelopes.Core;
 using ProjectS.Core.Repositories;
 using ProjectS.Core.Shared.ValueObjects;
@@ -7,29 +8,13 @@ using ProjectS.Core.ValueObjects;
 
 namespace ProjectS.Core.Handlers.Envelopes;
 
-public class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
+public class CreateNewUserEnvelopersConsumer(IEnvelopeRepository _repository) : IConsumer<CreateNewUserEnvelopers>
 {
-	#region Contructors
-
-	public UserCreatedEventHandler(IEnvelopeRepository repository, IMediator mediator)
-	{
-		_repository = repository;
-		_mediator = mediator;
-	}
-
-	#endregion
-
-	#region Propreties
-
-	private readonly IEnvelopeRepository _repository;
-	private readonly IMediator _mediator;
-
-	#endregion
-
 	#region Functions
 
-	public async Task Handle(UserCreatedEvent notification, CancellationToken cancellationToken)
+	public async Task Consume(ConsumeContext<CreateNewUserEnvelopers> context)
 	{
+		CreateNewUserEnvelopers request = context.Message;
 
 		Envelope tribute;
 		Envelope food;
@@ -46,20 +31,23 @@ public class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
 			Season season = new(today, nextMonthDay);
 
 			tribute = new(
+				request.UserId,
 				new Name("Tribute"),
 				EnvelopeType.Tribute,
 				new BasicMoneyDetail(0, 0),
 				season
-								);
+				);
 
 			food = new(
-			   new Name("Food"),
-			   EnvelopeType.Food,
-			   new BasicMoneyDetail(0, 0),
-			   season
-			   );
+				request.UserId,
+				new Name("Food"),
+				EnvelopeType.Food,
+				new BasicMoneyDetail(0, 0),
+				season
+				);
 
 			supply = new(
+				request.UserId,
 				new Name("Supply"),
 				EnvelopeType.Supply,
 				new BasicMoneyDetail(0, 0),
@@ -67,6 +55,7 @@ public class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
 				);
 
 			saving = new(
+				request.UserId,
 				new Name("Savings"),
 				EnvelopeType.Saving,
 				new BasicMoneyDetail(0, 0),
@@ -74,11 +63,14 @@ public class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
 				);
 
 
-			await _repository.CreateAsync([tribute, food, supply, saving]);
+			Envelope[] envelopes = [tribute, food, supply, saving];
+
+			await _repository.CreateAsync(envelopes);
+			await context.RespondAsync<GenericCommandResult>(new($"Envelopes successfully created", 200, envelopes));
 		}
 		catch
 		{
-
+			await context.RespondAsync<GenericCommandResult>(new("Fail to insert envelopes in database", 500));
 		}
 	}
 
