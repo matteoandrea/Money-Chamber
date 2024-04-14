@@ -6,6 +6,8 @@ public static class EndPointExtension
 {
 	public static void MapEndpoints(this WebApplication app)
 	{
-		app.MapUserEndpoints();
+		app.MapAuthEndpoints("v1/");
+		app.MapUserEndpoints("v1/");
+		app.MapDivisionEndpoints("v1/");
 	}
 }

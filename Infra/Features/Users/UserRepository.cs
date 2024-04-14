@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Core.ValueObjects;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using ProjectS.Core.Models;
 using ProjectS.Core.Repositories;
@@ -18,8 +19,9 @@ public class UserRepository(DataContext _context) : IUserRepository
 
 	public async Task<bool> AnyAsync(Email email)
 	{
-		return await _context.Users.FindSync(x => x.Email == email).AnyAsync();
-
+		return await _context.Users
+			.FindSync(x => x.Email == email)
+			.AnyAsync();
 	}
 
 	public async Task CreateAsync(User user)
@@ -27,21 +29,28 @@ public class UserRepository(DataContext _context) : IUserRepository
 		await _context.Users.InsertOneAsync(user);
 	}
 
-	public Task UpdateAsync(User user)
+	public async Task<User> GetByIdAsync(string id)
 	{
-		throw new NotImplementedException();
+		return await _context.Users
+			.Find(x => x.Id == id)
+			.FirstAsync();
 	}
 
-	public async Task DeleteAsync(Guid id)
+	public async Task<User> GetByEmailAsync(string email)
 	{
-		FilterDefinition<User> filter = Builders<User>.Filter.Eq("Id", id);
-		await _context.Users.DeleteOneAsync(filter);
+		return await _context.Users
+			.Find(x => x.Email.Address == email)
+			.FirstAsync();
 	}
 
-	public async Task<User?> GetByIdAsync(Guid id)
+	public async Task UpdateTokenAsync(string userId, AuthToken tokens)
 	{
-		return await _context.Users.AsQueryable().FirstOrDefaultAsync(x => x.Id == id);
+		FilterDefinition<User> filter = Builders<User>.Filter.Eq(x => x.Id, userId);
+		UpdateDefinition<User> updatedValue = Builders<User>.Update
+					.Set(x => x.AuthToken, tokens);
+		await _context.Users.UpdateOneAsync(filter, updatedValue);
 	}
 
 	#endregion
 }
+

@@ -1,13 +1,14 @@
 ﻿using Core.Core;
 using MassTransit;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Endpoints;
 
 public static class EndPointConfig
 {
 	public static WebApplication MediateGet<TRequest>(
-this WebApplication app,
-string template) where TRequest : class, IHttpsRequest
+		this WebApplication app,
+		string template) where TRequest : class, IHttpsRequest
 	{
 		app.MapGet(template, async (
 			IRequestClient<TRequest> request,
@@ -26,7 +27,6 @@ string template) where TRequest : class, IHttpsRequest
 
 		return app;
 	}
-
 
 	public static WebApplication MediatePut<TRequest>(
 	this WebApplication app,

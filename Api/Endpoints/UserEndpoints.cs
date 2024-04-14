@@ -4,9 +4,10 @@ namespace Api.Endpoints;
 
 public static class UserEndpoints
 {
-	public static void MapUserEndpoints(this WebApplication app)
+	private static readonly string _headPath = "user/";
+	public static void MapUserEndpoints(this WebApplication app, string version)
 	{
-		app.MediatePost<CreateUser>("user/v1/create/{user}");
+		app.MediatePost<PostCreateUser>(string.Concat(_headPath, version, "create"));
 	}
 
 }

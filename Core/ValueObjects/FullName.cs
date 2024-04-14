@@ -10,7 +10,7 @@ public class FullName : ValueObject
 		FirstName = firstName.ToLower();
 		LastName = lastName.ToLower();
 
-		AddNotifications(new BasicFullNameValidationContract(this));
+		AddNotifications(new FullNameValidationContract(this));
 	}
 
 	public string FirstName { get; init; }
@@ -18,15 +18,15 @@ public class FullName : ValueObject
 
 	public override string ToString()
 	{
-		string firstName = char.ToUpper(FirstName[0]) + FirstName.Substring(1);
-		string lastName = char.ToUpper(LastName[0]) + LastName.Substring(1);
+		string firstName = char.ToUpper(FirstName[0]) + FirstName[1..];
+		string lastName = char.ToUpper(LastName[0]) + LastName[1..];
 		return firstName + " " + lastName;
 	}
 }
 
-public class BasicFullNameValidationContract : Contract<FullName>
+public class FullNameValidationContract : Contract<FullName>
 {
-	public BasicFullNameValidationContract(FullName fullName)
+	public FullNameValidationContract(FullName fullName)
 	{
 		Requires()
 			.IsNotNullOrEmpty(fullName.FirstName, "FirstName", "Invalid name")

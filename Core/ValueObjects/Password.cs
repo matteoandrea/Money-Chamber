@@ -1,115 +1,86 @@
-﻿using Flunt.Validations;
-using ProjectS.Core.Core;
-using ProjectS.Core.Core.Objects;
+﻿using ProjectS.Core.Core.Objects;
 using System.Security.Cryptography;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ProjectS.Core.Shared.ValueObjects;
 
 public class Password : ValueObject
 {
 
-    #region Constructors
+	#region Constructors
+	public Password(string? text = null)
+	{
+		if (string.IsNullOrEmpty(text) || string.IsNullOrWhiteSpace(text))
+			text = Generate();
 
-    protected Password()
-    {
-        Hash = string.Empty;
-        ResetCode = Guid.NewGuid().ToString("N")[..8].ToUpper();
-    }
+		Hash = HashPassword(text);
+		ResetCode = Guid.NewGuid().ToString("N")[..8].ToUpper();
+	}
 
-    public Password(string? text = null)
-    {
-        if (string.IsNullOrEmpty(text) || string.IsNullOrWhiteSpace(text))
-            text = Generate();
+	#endregion
 
-        Hash = Hashing(text);
-        ResetCode = Guid.NewGuid().ToString("N")[..8].ToUpper();
-    }
+	#region Propreties
 
-    #endregion
+	private readonly string _validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+	private readonly string _specialChars = "!@#$%ˆ&*(){}[];";
 
-    #region Propreties
-
-    private const string Valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    private const string Special = "!@#$%ˆ&*(){}[];";
-
-    public string Hash { get; }
-    public string ResetCode { get; }
+	public string Hash { get; init; }
+	public string ResetCode { get; init; }
 
 
-    #endregion
+	#endregion
 
-    #region Functions
+	#region Functions
 
-    private string Generate(
-        short length = 16,
-        bool includeSpecialChars = true,
-        bool upperCase = false)
-    {
-        var chars = includeSpecialChars ? Valid + Special : Valid;
-        var startRandom = upperCase ? 26 : 0;
-        var index = 0;
-        var res = new char[length];
-        var rnd = new Random();
+	public bool Verify(string passwordToCheck)
+	{
+		var parts = Hash.Split('.');
+		if (parts.Length != 3)
+			return false;
 
-        while (index < length)
-            res[index++] = chars[rnd.Next(startRandom, chars.Length)];
+		var iterations = int.Parse(parts[0]);
+		var salt = Convert.FromBase64String(parts[1]);
+		var key = Convert.FromBase64String(parts[2]);
 
-        return new string(res);
-    }
+		using Rfc2898DeriveBytes algorithm = new(passwordToCheck, salt, iterations, HashAlgorithmName.SHA256);
+		byte[] keyToCheck = algorithm.GetBytes(key.Length);
 
-    private string Hashing(
-        string password,
-        short saltSize = 16,
-        short keySize = 32,
-        int iterations = 10000,
-        char splitChar = '.')
-    {
-        if (string.IsNullOrEmpty(password))
-            throw new Exception("Password should not be null or empty");
+		return keyToCheck.SequenceEqual(key);
+	}
 
-        password += Configuration.Secrets.PasswordSaltKey;
 
-        using var algorithm = new Rfc2898DeriveBytes(
-            password,
-            saltSize,
-            iterations,
-            HashAlgorithmName.SHA256);
-        var key = Convert.ToBase64String(algorithm.GetBytes(keySize));
-        var salt = Convert.ToBase64String(algorithm.Salt);
+	private string Generate(short length = 16, bool includeSpecialChars = true, bool upperCase = false)
+	{
+		string chars = _validChars + (includeSpecialChars ? _specialChars : "");
+		Random random = new();
+		string password = new(Enumerable.Repeat(chars, length)
+		  .Select(x => x[random.Next(x.Length)]).ToArray());
 
-        return $"{iterations}{splitChar}{salt}{splitChar}{key}";
-    }
+		return upperCase ? password.ToUpper() : password;
+	}
 
-    private bool Verify(
-       string hash,
-       string password,
-       short keySize = 32,
-       int iterations = 10000,
-       char splitChar = '.')
-    {
-        password += Configuration.Secrets.PasswordSaltKey;
+	private string HashPassword(string password, int saltSize = 16, int keySize = 32, int iterations = 10000)
+	{
+		if (string.IsNullOrEmpty(password))
+			throw new ArgumentNullException(nameof(password), "Password should not be null or empty");
 
-        var parts = hash.Split(splitChar, 3);
-        if (parts.Length != 3)
-            return false;
+		byte[] salt = GenerateSalt(saltSize);
+		using Rfc2898DeriveBytes algorithm = new(password, salt, iterations, HashAlgorithmName.SHA256);
+		string key = Convert.ToBase64String(algorithm.GetBytes(keySize));
 
-        var hashIterations = Convert.ToInt32(parts[0]);
-        var salt = Convert.FromBase64String(parts[1]);
-        var key = Convert.FromBase64String(parts[2]);
+		return $"{iterations}.{Convert.ToBase64String(salt)}.{key}";
+	}
 
-        if (hashIterations != iterations)
-            return false;
+	private byte[] GenerateSalt(int saltSize)
+	{
+		byte[] salt = new byte[saltSize];
+		using (var rng = RandomNumberGenerator.Create())
+		{
+			rng.GetBytes(salt);
+		}
+		return salt;
+	}
 
-        using var algorithm = new Rfc2898DeriveBytes(
-            password,
-            salt,
-            iterations,
-            HashAlgorithmName.SHA256);
-        var keyToCheck = algorithm.GetBytes(keySize);
 
-        return keyToCheck.SequenceEqual(key);
-    }
 
-    #endregion
+	#endregion
 }

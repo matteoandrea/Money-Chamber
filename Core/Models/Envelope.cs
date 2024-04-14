@@ -1,5 +1,5 @@
-﻿using ProjectS.Core.Core.Objects;
-using ProjectS.Core.Models;
+﻿using Core.ValueObjects;
+using ProjectS.Core.Core.Objects;
 using ProjectS.Core.Shared.ValueObjects;
 using ProjectS.Core.ValueObjects;
 
@@ -7,38 +7,27 @@ namespace ProjectS.Core.Features.Envelopes.Core;
 
 public class Envelope : Entity
 {
-	public Envelope(
-		Guid userId,
-		Name name,
-		EnvelopeType type,
-		BasicMoneyDetail details,
-		Season season
-		)
+	public Envelope(string userId,
+				 Name name,
+				 Name tag,
+				 MoneyDetails moneyDetails,
+				 EnvelopeCycle cycle)
 	{
 		UserId = userId;
-
 		Name = name;
-		Type = type;
+		Tag = tag;
+		MoneyDetails = moneyDetails;
+		Cycle = cycle;
 
-		Details = details;
-		Season = season;
-
-		AddNotifications(Name, Details);
+		AddNotifications(Name,
+				   Tag,
+				   MoneyDetails,
+				   Cycle);
 	}
 
-
-	#region Propreties
-
-	public Guid UserId { get; init; }
-
+	public string UserId { get; init; }
 	public Name Name { get; init; }
-	public BasicMoneyDetail Details { get; init; }
-
-	public EnvelopeType Type { get; init; }
-	public Season Season { get; init; }
-
-	public IEnumerable<Section> Sections { get; init; } = Enumerable.Empty<Section>();
-	public IEnumerable<SectionGroup> SectionsGroup { get; init; } = Enumerable.Empty<SectionGroup>();
-
-	#endregion
+	public Name Tag { get; init; }
+	public MoneyDetails MoneyDetails { get; init; }
+	public EnvelopeCycle Cycle { get; init; }
 }

@@ -19,6 +19,12 @@ public abstract class Command<T> : Notifiable<Notification>, ICommand, IMap<T>
 	public abstract void Validate();
 }
 
+public abstract class Command : Notifiable<Notification>, ICommand
+{
+
+	public abstract void Validate();
+}
+
 public record GenericCommandResult(string Message, int Status, object? Data = null, IEnumerable<Notification>? Notifications = null) : ICommandResult
 {
 	public bool Success => Status >= 200 && Status <= 299;

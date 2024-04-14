@@ -4,30 +4,46 @@ namespace ProjectS.Core.Core.Objects;
 
 public abstract class Entity : Notifiable<Notification>, IEquatable<Guid>
 {
-    #region Constructors
+	#region Constructors
 
-    public Entity()
-    {
-        Id = Guid.NewGuid();
-        Active = true;
-        CreationDate = DateTime.UtcNow;
-    }
+	protected Entity(string id,
+				  bool active,
+				  DateTime creationDate)
+	{
+		Id = id;
+		Active = active;
+		CreationDate = creationDate;
+	}
 
-    #endregion
+	protected Entity(string id)
+	{
+		Id = id;
+		Active = true;
+		CreationDate = DateTime.UtcNow;
+	}
 
-    #region Propreties
+	public Entity()
+	{
+		Id = Guid.NewGuid().ToString();
+		Active = true;
+		CreationDate = DateTime.UtcNow;
+	}
 
-    public Guid Id { get; init; }
-    public bool Active { get; init; }
-    public DateTime CreationDate { get; init; }
+	#endregion
 
-    #endregion
+	#region Propreties
 
-    #region Functions
+	public string Id { get; init; }
+	public bool Active { get; init; }
+	public DateTime CreationDate { get; init; }
 
-    public bool Equals(Guid id) => Id == Id;
+	#endregion
 
-    public override int GetHashCode() => Id.GetHashCode();
+	#region Functions
 
-    #endregion
+	public bool Equals(Guid id) => Id == Id;
+
+	public override int GetHashCode() => Id.GetHashCode();
+
+	#endregion
 }

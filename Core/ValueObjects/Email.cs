@@ -5,43 +5,43 @@ namespace ProjectS.Core.Shared.ValueObjects;
 
 public class Email : ValueObject
 {
-    #region Constructors
+	#region Constructors
+	public Email() { }
 
-    public Email(string adress)
-    {
-        Adress = adress.Trim().ToLower();
-        //VerificationCode = new();
+	public Email(string adress)
+	{
+		Address = adress.Trim().ToLower();
+		//VerificationCode = new();
+		AddNotifications(new EmailValidationContract(this));
+	}
 
-        AddNotifications(new BasicEmailValidationContract(this));
-    }
+	#endregion
 
-    #endregion
+	#region Propreties
 
-    #region Propreties
+	public string Address { get; init; }
+	//public VerificationCode VerificationCode { get; private set; }
 
-    public string Adress { get; init; }
-    //public VerificationCode VerificationCode { get; private set; }
+	#endregion
 
-    #endregion
+	#region Functions
 
-    #region Functions
+	public override string ToString() => Address;
 
-    public override string ToString() => Adress;
+	//public void ResendVerification()
+	//{
+	//    VerificationCode = new();
+	//}
 
-    //public void ResendVerification()
-    //{
-    //    VerificationCode = new();
-    //}
-
-    #endregion
+	#endregion
 }
 
-public class BasicEmailValidationContract : Contract<Email>
+public class EmailValidationContract : Contract<Email>
 {
-    public BasicEmailValidationContract(Email email)
-    {
-        Requires()
-            .IsEmail(email.Adress, "Email", "Ivalid email");
+	public EmailValidationContract(Email email)
+	{
+		Requires()
+			.IsEmail(email.Address, "Email", "Ivalid email");
 
-    }
+	}
 }

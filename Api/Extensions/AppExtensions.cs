@@ -11,7 +11,7 @@ public static class AppExtensions
 		}
 
 		app.UseHttpsRedirection();
-
-
+		app.UseAuthentication();
+		app.UseAuthorization();
 	}
 }

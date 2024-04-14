@@ -9,15 +9,15 @@ public class Description : ValueObject
     {
         Value = value;
 
-        AddNotifications(new CreateDescriptionContract(this));
+        AddNotifications(new DescriptionValidationContract(this));
     }
 
-    public string Value { get; private set; }
+    public readonly string Value;
 }
 
-public class CreateDescriptionContract : Contract<Description>
+public class DescriptionValidationContract : Contract<Description>
 {
-    public CreateDescriptionContract(Description description)
+    public DescriptionValidationContract(Description description)
     {
         Requires()
             .IsNotEmpty(description.Value, "Description", "Invalid description")

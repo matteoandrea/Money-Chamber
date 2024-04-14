@@ -5,23 +5,22 @@ namespace ProjectS.Core.Shared.ValueObjects;
 
 public class Name : ValueObject
 {
-    public Name(string firstName)
-    {
-        FirstName = firstName.ToLower();
+	public Name(string firstName)
+	{
+		FirstName = firstName.ToLower();
+		AddNotifications(new NameValidationContract(this));
+	}
 
-        AddNotifications(new BasicNameValidationContract(this));
-    }
-
-    public string FirstName { get; init; }
+	public string FirstName { get; init; }
 }
 
-public class BasicNameValidationContract : Contract<Name>
+public class NameValidationContract : Contract<Name>
 {
-    public BasicNameValidationContract(Name name)
-    {
-        Requires()
-            .IsNotNullOrEmpty(name.FirstName, "FirstName", "Invalid name")
-            .IsGreaterOrEqualsThan(name.FirstName, 4, "FirstName", "Must be a longer name")
-            .IsLowerOrEqualsThan(name.FirstName, 50, "FirstName", "Must be a shorter name");
-    }
+	public NameValidationContract(Name name)
+	{
+		Requires()
+			.IsNotNullOrEmpty(name.FirstName, "FirstName", "Invalid name")
+			.IsGreaterOrEqualsThan(name.FirstName, 4, "FirstName", "Must be a longer name")
+			.IsLowerOrEqualsThan(name.FirstName, 50, "FirstName", "Must be a shorter name");
+	}
 }

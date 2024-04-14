@@ -4,7 +4,7 @@ using ProjectS.Api.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 builder.AddArchitectures();
 builder.AddServices();
-builder.AddConsumers();
+builder.AddRequestsAndConsumers();
 
 var app = builder.Build();
 app.UseArchitectures();

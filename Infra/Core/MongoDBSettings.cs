@@ -1,6 +1,4 @@
-﻿using MongoDB.Driver;
-
-namespace ProjectS.Infra.Core;
+﻿namespace ProjectS.Infra.Core;
 
 public class MongoDBSettings
 
@@ -8,6 +6,6 @@ public class MongoDBSettings
 	public string ConnectionString { get; set; } = null!;
 	public string DatabaseName { get; set; } = null!;
 	public string UserCollectionName { get; set; } = null!;
-	public string EnvelopeCollectionName { get; set; } = null!;
+	public string DivisionCollectionName { get; set; } = null!;
 	public string TransactionCollectionName { get; set; } = null!;
 }
